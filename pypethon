@@ -17,9 +17,13 @@ if __name__ == "__main__":
     while True:
         try:
             # read, eval, print
-            print(evaluate(read("> "), state))
+            value = evaluate(read("> "), state)
+            if value:
+                print(value)
             # loop ...
         except exceptions.SyntaxException as e:
             print(e)
         except KeyboardInterrupt:
             exit(0)
+        except Exception as e:
+            print(e)

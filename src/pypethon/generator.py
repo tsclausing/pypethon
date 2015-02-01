@@ -105,10 +105,15 @@ def _(node, assign=False):
 
 @translate.register(lexer.Integer)
 def _(node):
-    return ast.Num(
-        lineno=1,
-        col_offset=node.pos,
-        n=int(node.value)
+    return ast.Call(
+        func=ast.Name(
+            id='Integer',
+            ctx=ast.Load()
+        ),
+        args=[ast.Num(n=int(node.value))],
+        keywords=[],
+        starargs=None,
+        kwargs=None,
     )
 
 

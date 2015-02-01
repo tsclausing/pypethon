@@ -1,0 +1,25 @@
+#!/usr/bin/python3
+"""
+A simple, stateful REPL, or read eval print loop.
+"""
+import sys
+sys.path.append("src/")
+
+from pypethon import stdlib
+from pypethon import exceptions
+from pypethon.interpreter import evaluate
+
+read = input
+state = stdlib.build()
+
+
+if __name__ == "__main__":
+    while True:
+        try:
+            # read, eval, print
+            print(evaluate(read("> "), state))
+            # loop ...
+        except exceptions.SyntaxException as e:
+            print(e)
+        except KeyboardInterrupt:
+            exit(0)

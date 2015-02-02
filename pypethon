@@ -5,6 +5,10 @@ A simple, stateful REPL, or read eval print loop.
 import sys
 sys.path.append("src/")
 
+# REPL history
+try: import readline
+except: pass
+
 from pypethon import stdlib
 from pypethon import exceptions
 from pypethon.interpreter import evaluate

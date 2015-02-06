@@ -6,6 +6,7 @@ Parsing: http://en.wikipedia.org/wiki/Parsing
 from collections import namedtuple
 from functools import singledispatch
 
+from pypethon import exceptions
 from pypethon import lexer
 
 Assignment = namedtuple("Assignment", "name, expression")
@@ -61,7 +62,11 @@ def _(root, tokens):
         name=ast(tokens),
         expression=ast(tokens),
     )
-    # TODO: enforce grammar
+    # Enforce grammar for Assignment: `|= Name Pipe`
+    if not isinstance(node.name, lexer.Name):
+        raise exceptions.SyntaxException("Invalid name")
+    if not isinstance(node.expression, (lexer.Integer, Pipe)):
+        raise exceptions.SyntaxException("Invalid value")
     return node
 
 
@@ -71,7 +76,11 @@ def _(root, tokens):
         name=ast(tokens),
         expression=ast(tokens),
     )
-    # TODO: enforce grammar
+    # Enforce grammar for Function: `|= Name Pipe`
+    if not isinstance(node.name, lexer.Name):
+        raise exceptions.SyntaxException("Invalid pipe name")
+    if not isinstance(node.expression, Pipe):
+        raise exceptions.SyntaxException("Invalid pipe value")
     return node
 
 
@@ -80,7 +89,13 @@ def parse_pipe(left, tokens):
         left=left,
         right=ast(tokens),
     )
-    # TODO: enforce grammar
+    # Enforce grammar for Pipe: `[Name|Integer] | [Name|Integer|Pipe]`
+    if not isinstance(node.left, (lexer.Name, lexer.Integer)):
+        raise exceptions.SyntaxException("Invalid pipe left value: %s" % str(node.left))
+    if not isinstance(node.right, (lexer.Name, lexer.Integer, Pipe)):
+        raise exceptions.SyntaxException("Invalid pipe right value: %s" % str(node.right))
+    if isinstance(node.left, lexer.Integer) and isinstance(node.right, lexer.Integer):
+        raise exceptions.SyntaxException("Cannot pipe an integer to an integer")
     return node
 
 

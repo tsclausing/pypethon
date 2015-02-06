@@ -35,7 +35,7 @@ def translate(node):
     """
     Recursively transform a Pypethon AST node into a Python AST node.
     """
-    raise NotImplementedError('Python AST Generation Error: translate(%r)' % node)
+    raise NotImplementedError('Python AST Generation Error: translate(%s)' % str(node))
 
 
 @translate.register(parser.Assignment)

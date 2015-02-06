@@ -29,7 +29,7 @@ def translate(node):
     """
     Recursively translate a Pypethon Abstract Syntax Tree into a Python Abstract Syntax Tree for Python's `compile()`.
     """
-    raise NotImplementedError('translate(%r)' % node)
+    raise NotImplementedError('translate(%s)' % str(node))
 
 
 @translate.register(Integer)

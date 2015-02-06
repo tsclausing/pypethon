@@ -11,7 +11,8 @@ from pypethon.generator import generate
 
 def compile(source: str):
     """
-    >>> exec(compile("42"), {})
+    >>> from pypethon.stdlib import build
+    >>> exec(compile("42"), build())
     42
     """
     return generate(parse(lex(source)))

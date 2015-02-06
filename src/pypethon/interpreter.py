@@ -8,7 +8,8 @@ from pypethon.compiler import compile
 
 def evaluate(source: str, namespace: dict):
     """
-    >>> evaluate("42", {})
+    >>> from pypethon.stdlib import build
+    >>> evaluate("42", build())
     42
     """
     return exec(compile(source), namespace) if source else None

@@ -15,6 +15,7 @@ PipeEqual = namedtuple("PipeEqual", "pos value")
 Integer = namedtuple("Integer", "pos value")
 Name = namedtuple("Name", "pos value")
 Whitespace = namedtuple("Whitespace", "pos value")
+Comment = namedtuple("Comment", "pos value")
 
 KEYWORDS = (
     (r"|=", PipeEqual),
@@ -25,6 +26,7 @@ PATTERNS = (
     (r"^\s", Whitespace),
     (r"^\-?\d+", Integer),
     (r"^[a-zA-Z][a-zA-Z0-9]*", Name),
+    (r"^\#.*", Comment),
 )
 
 
@@ -34,8 +36,8 @@ def lex(source) -> [namedtuple]:
     [Equal(pos=0, value='='), Name(pos=2, value='ans'), Integer(pos=6, value='-42'), Pipe(pos=10, value='|'), Name(pos=12, value='abs')]
     """
     tokens = tokenize(source)
-    tokens = drop_whitespace(tokens)
-    tokens = make_peekable(tokens)
+    tokens = drop(tokens, Whitespace, Comment)
+    tokens = peekable(tokens)
     return tokens
 
 
@@ -64,17 +66,15 @@ def pop_pattern_token(string, position):
             return constructor(position, value), string[len(value):]
 
 
-def drop_whitespace(tokens):
+def drop(tokens, *types):
     for token in tokens:
-        if not isinstance(token, Whitespace):
+        if not isinstance(token, types):
             yield token
 
 
-def make_peekable(tokens):
-    current = None
+def peekable(tokens):
     for token in tokens:
-        current = token
-        putback = yield token
-        if putback and putback is current:
+        sent_back = yield token
+        if sent_back and sent_back is token:
             yield True
-            yield current
+            yield token

@@ -23,16 +23,29 @@ def parse(tokens):
     >>> parse(lex("|= correct abs | inc"))
     Function(name=Name(pos=3, value='correct'), expression=Pipe(left=Name(pos=11, value='abs'), right=Name(pos=17, value='inc')))
     """
-    return tree(next(tokens), tokens)
+    tree = ast(tokens)
+    # todo: enforce anything at the tree level?
+    enforce_no_remaining_tokens(tokens)
+    return tree
+
+
+#
+# AST Building
+#
 
 
 @singledispatch
-def tree(root, tokens):
-    raise NotImplementedError("Pypethon AST Generation Error: tree(%r)" % root)
+def ast(root: "or tokens", tokens=None):
+    """
+    Returns a Pypethon Abstract Syntax Tree.
+    """
+    if not tokens:
+        tokens = root
+    return ast(next(tokens), tokens)
 
 
-@tree.register(lexer.Name)
-@tree.register(lexer.Integer)
+@ast.register(lexer.Name)
+@ast.register(lexer.Integer)
 def _(root, tokens):
     # "look ahead" for a Pipe, then immediately put the next_token back
     next_token = next(tokens, None)
@@ -43,21 +56,21 @@ def _(root, tokens):
     return root
 
 
-@tree.register(lexer.Equal)
+@ast.register(lexer.Equal)
 def _(root, tokens):
     node = Assignment(
-        name=parse(tokens),
-        expression=parse(tokens),
+        name=ast(tokens),
+        expression=ast(tokens),
     )
     # TODO: enforce grammar
     return node
 
 
-@tree.register(lexer.PipeEqual)
+@ast.register(lexer.PipeEqual)
 def _(root, tokens):
     node = Function(
-        name=parse(tokens),
-        expression=parse(tokens),
+        name=ast(tokens),
+        expression=ast(tokens),
     )
     # TODO: enforce grammar
     return node
@@ -66,7 +79,17 @@ def _(root, tokens):
 def parse_pipe(left, tokens):
     node = Pipe(
         left=left,
-        right=parse(tokens),
+        right=ast(tokens),
     )
     # TODO: enforce grammar
     return node
+
+
+#
+# Parser Rules
+#
+
+def enforce_no_remaining_tokens(tokens):
+    unexpected_token = next(tokens, False)
+    if unexpected_token:
+        raise SyntaxError("Unexpected %s at position %d" % (unexpected_token.value, unexpected_token.pos))

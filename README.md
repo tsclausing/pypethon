@@ -7,18 +7,23 @@ The README below includes a quickstart tutorial. Please see [the wiki](https://g
 ```bash
 $ python3 pypethon
 > 
-> = foo -10 | abs | inc
-> foo
+> 11  # Pypethon has integers and comments.
+11
+> 
+> = val 11  # Variables can hold values!
+> val
 11
 >
-> = foo foo | plus | 5 | times | 3
-> foo
-48
+> # And values can flow through pipes!! 
+> val | times | 4 | minus | 3 | inc 
+42
 > 
+> # We can even hold a pipe in a variable.
 > |= minus6 minus | 6
 > 
-> foo | minus6
-42
+> # And run a value through it!
+> 17 | minus6  # (°□°)
+11
 >
 ```
 

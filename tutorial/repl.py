@@ -3,9 +3,9 @@ The Pypethon Tutorial!
 
 See the README.md file for instructions.
 """
-from functools import singledispatch
-from collections import namedtuple
-import ast
+from .parser import parse
+from .lexer import lex
+from .generator import generate
 
 
 #
@@ -17,6 +17,8 @@ def repl():
     Runs a Pypethon Read-Eval-Print-Loop.
     """
     while True:
+        # todo: implement a way to exit gracefully
+        # todo: display error messages and keep going instead of blowing up
         print(evaluate(input("tutorial> ")))
 
 
@@ -27,47 +29,19 @@ def evaluate(source):
     * Compile: lex, parse, generate bytecode
     * Interpret: execute bytecode with Python's builtin `eval()`
     """
-    return eval(generate(parse(lex(source))))
-
-
-#
-# The Pypethon Compiler!
-#
-
-
-def lex(string) -> "tokens":
-    """
-    Lex the string and output a generator of tokens for `parse()`.
-    """
-    pass
-
-
-def parse(tokens) -> "tree":
-    """
-    Parse the tokens and output a tree which represents the meaning of the token stream for `generate()`.
-    """
-    pass
-
-
-def generate(tree) -> "bytecode":
-    """
-    With the help of `translate()` below, generate Python bytecode for the Python's `eval()`.
-
-    https://docs.python.org/3/library/functions.html#compile
-    """
-    return compile(
-        source=ast.fix_missing_locations(ast.Expression(body=translate(tree))),
-        filename="<input>",
-        mode="eval"
+    return eval(
+        generate(parse(lex(source))),
+        # todo: write the standard library. currently, it only includes `inc`.
+        {'__builtins__': {
+            'inc': lambda n: n + 1,
+            # todo: implement `dec` to decrement an integer
+        }}
+        # todo: add callable Integer data type (also requires change in generator.py)
+        # then ...
+        #   todo: implement `plus`
+        #   todo: implement `minus`
+        #   todo: implement `times`
     )
-
-
-@singledispatch
-def translate(node):
-    """
-    Recursively translate a Pypethon Abstract Syntax Tree into a Python Abstract Syntax Tree for Python's `compile()`.
-    """
-    raise NotImplementedError('translate(%r)' % node)
 
 
 #

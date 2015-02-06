@@ -39,8 +39,7 @@ def ast(root: "or tokens", tokens=None):
     """
     Returns a Pypethon Abstract Syntax Tree.
     """
-    if not tokens:
-        tokens = root
+    tokens = tokens or root
     return ast(next(tokens), tokens)
 
 
